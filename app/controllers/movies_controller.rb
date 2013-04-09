@@ -7,26 +7,35 @@ class MoviesController < ApplicationController
   end
 
   def index
-    sorted_by = params[:sorted_by]
     @all_ratings = Movie.all_ratings
-    if params[:ratings].nil?
-      if params[:ratings_filter].nil?
+    sorted_by = params[:sorted_by]
+    @ratings = params[:ratings]
+    if @ratings.nil? and not session[:ratings].nil?
+      flash.keep
+      redirect_to movies_path({:ratings => session[:ratings], :sorted_by => session[:sorted_by]})
+    else
+      if @ratings.nil?
         @ratings_filter = @all_ratings
+        @ratings = @all_ratings.inject({}) {|hsh, elt| hsh[elt] = "1"; hsh}
       else
-        @ratings_filter = params[:ratings_filter]
+        @ratings_filter = @ratings.keys
       end
-    else
-      @ratings_filter = params[:ratings].keys
-    end
-    if sorted_by == "title"
-      @movies = Movie.find(:all, :order => sorted_by, :conditions => ["rating IN (?)", @ratings_filter])
-      @hilite_title = true
-    elsif sorted_by == "release_date"
-      @movies = Movie.find(:all, :order => sorted_by, :conditions => ["rating IN (?)", @ratings_filter])
-      @hilite_release_date = true
-    else
-      @movies = Movie.find(:all, :conditions => ["rating IN (?)",
+      session[:ratings] = @ratings
+
+      if sorted_by == "title"
+        @hilite_title = true
+      elsif sorted_by == "release_date"
+        @hilite_release_date = true
+      end
+      session[:sorted_by] = sorted_by
+
+      if sorted_by.nil?
+        @movies = Movie.find(:all, :conditions => ["rating IN (?)",
                                                   @ratings_filter])
+      else
+        @movies = Movie.find(:all, :order => sorted_by, :conditions =>
+                          ["rating IN (?)", @ratings_filter])
+      end
     end
   end
 
