@@ -7,9 +7,12 @@ class MoviesController < ApplicationController
   end
 
   def index
-    by = params[:by]
-    if not by.nil?
-      @movies = Movie.all({:order => by})
+    title_header = params[:title_header]
+    release_date_header = params[:release_date_header]
+    if not title_header.nil?
+      @movies = Movie.all({:order => "title"})
+    elsif not release_date_header.nil?
+      @movies = Movie.all({:order => "release_date"})
     else
       @movies = Movie.all
     end

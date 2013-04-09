@@ -4,9 +4,9 @@
 %table#movies
   %thead
     %tr
-      %th= link_to "Movie Title", movies_path({:by => "title"})
+      %th= link_to "Movie Title", movies_path({:title_header => true})
       %th Rating
-      %th= link_to "Release Date", movies_path({:by => "release_date"})
+      %th= link_to "Release Date", movies_path({:release_date_header => true})
       %th More Info
   %tbody
     - @movies.each do |movie|
